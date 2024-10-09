@@ -1,0 +1,25 @@
+plugins {
+    id 'java'
+}
+
+group = 'cufe.example'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+    maven { url "https://grobid.s3.eu-west-1.amazonaws.com/repo/" }
+}
+
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.9.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    implementation 'org.grobid:grobid-core:0.8.0'
+    implementation 'org.grobid:grobid-trainer:0.8.0'
+    implementation 'org.apache.lucene:lucene-core:8.11.1'
+    implementation 'org.apache.lucene:lucene-analyzers-common:8.11.1'
+    implementation 'org.apache.lucene:lucene-queryparser:8.11.1'
+}
+
+test {
+    useJUnitPlatform()
+}
