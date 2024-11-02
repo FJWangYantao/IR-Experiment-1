@@ -1,4 +1,4 @@
-package cufe.example;
+package cufe.example.ProcessDataSection;
 
 import org.jbibtex.*;
 
@@ -55,17 +55,15 @@ public class BibTeXToXMLConverter {
                     for (Map.Entry<Key, BibTeXEntry> entry : database.getEntries().entrySet()) {
                         BibTeXEntry bibEntry = entry.getValue();
                         bibEntry.getFields().forEach((key, value) -> {
-                            convertedContent.append("  <" + key.getValue() + ">" + value.toUserString() + "</" + key.getValue() + ">\n");
+                            convertedContent.append("  <" + key.getValue() + ">" + escapeXml(value.toUserString()) + "</" + key.getValue() + ">\n");
                         });
                     }
                     convertedContent.append("</entry>\n");
-                    String xmlFormatFile = escapeXml(convertedContent.toString());
-                    saveToXmlFile(xmlFormatFile,"D:/360MoveData/Users/asus/Desktop/XML/ConvertedData/" + "convertedData_" + count + ".xml");
+//                    String xmlFormatFile = escapeXml(convertedContent.toString());
+
+                    saveToXmlFile(convertedContent.toString(),"D:/360MoveData/Users/asus/Desktop/XML/ConvertedData/" + "convertedData_" + count + ".xml");
                     System.out.println(bibTexFile.getName() + "converted!");
                     count++;
-                }
-                else {
-                    System.out.println("Skipped file: " + bibTexFile.getName());
                 }
             }
 
@@ -82,9 +80,10 @@ public class BibTeXToXMLConverter {
         if (input == null) {
             return null;
         }
-        input.replace("&", "&amp;");
-        input.replace("β","$\\beta$");
-        input.replace("†","\\textdagger");
+        input = input.replace("&", "&amp;");
+        input = input.replace("<","&lt;");
+        input = input.replace(">","&gt;");
+        input = input.replaceAll("[^\\p{Print}]", "");
         return input;
 
     }

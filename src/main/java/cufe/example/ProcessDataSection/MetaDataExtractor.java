@@ -1,4 +1,4 @@
-package cufe.example;
+package cufe.example.ProcessDataSection;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -68,10 +68,6 @@ public class MetaDataExtractor {
             int count = 1;
             File filePath = new File("D:/360MoveData/Users/asus/Desktop/oriPDFs/oriPDFs/");
             for (File pdfFile : filePath.listFiles()){
-                if(count < 718){
-                    count++;
-                    continue;
-                }
                 if (pdfFile.isFile() && pdfFile.getName().endsWith(".pdf")){
                     pdfMetadataXml = client.ExtractDocumentsMetadata(pdfFile.getPath());
                     client.saveToXmlFile(pdfMetadataXml,"D:/360MoveData/Users/asus/Desktop/XML/Metadata/" + "ExtractedData_" + count + ".bib");
