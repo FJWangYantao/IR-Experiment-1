@@ -18,6 +18,7 @@ dependencies {
     implementation 'org.apache.lucene:lucene-core:8.11.1'
     implementation 'org.apache.lucene:lucene-analyzers-common:8.11.1'
     implementation 'org.apache.lucene:lucene-queryparser:8.11.1'
+    implementation 'org.jbibtex:jbibtex:1.0.19'
 }
 
 test {
