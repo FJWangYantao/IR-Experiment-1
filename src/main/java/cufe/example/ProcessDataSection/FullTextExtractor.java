@@ -4,6 +4,8 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import static cufe.example.ProcessDataSection.BibTeXToXMLConverter.escapeXml;
+
 public class FullTextExtractor {
 
     private final String grobidUrl;
@@ -14,7 +16,7 @@ public class FullTextExtractor {
 
     public String processFulltextDocument(String filePath) throws IOException {
         File file = new File(filePath);
-        HttpURLConnection connection = (HttpURLConnection) new URL(grobidUrl + "/api/processFulltextDocument").openConnection();
+        HttpURLConnection connection = (HttpURLConnection) new URL(grobidUrl + "/api/processFulltextDocument?output=xml&include=fulltext").openConnection();
         connection.setDoOutput(true);
         connection.setRequestMethod("POST");
         connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=*****");
@@ -67,7 +69,7 @@ public class FullTextExtractor {
             File filePath = new File("D:/360MoveData/Users/asus/Desktop/oriPDFs/oriPDFs/");
             for(File pdfFile : filePath.listFiles()){
                 if (pdfFile.isFile() && pdfFile.getName().endsWith(".pdf")){
-                    pdfFullTextXml = client.processFulltextDocument(pdfFile.getPath());
+                    pdfFullTextXml = escapeXml(client.processFulltextDocument(pdfFile.getPath()));
                     client.saveToXmlFile(pdfFullTextXml,"D:/360MoveData/Users/asus/Desktop/XML/FullTexts/" + "fullTexts" + count + ".xml");
                     System.out.println("Full Text " + count + " was extracted successfully.");
                     count++;
@@ -77,5 +79,13 @@ public class FullTextExtractor {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static String escapeXml(String input) {
+        if (input == null) {
+            return null;
+        }
+        input = input.replaceAll("[^\\p{Print}]", "");
+        return input;
     }
 }

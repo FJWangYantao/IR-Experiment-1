@@ -85,7 +85,6 @@ public class BibTeXToXMLConverter {
         input = input.replace(">","&gt;");
         input = input.replaceAll("[^\\p{Print}]", "");
         return input;
-
     }
 
 
