@@ -8,11 +8,12 @@ import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.*;
 
 import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.RAMDirectory;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class LuceneEngine {
@@ -38,32 +39,16 @@ public class LuceneEngine {
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 
-        for (File fullTextFile: listOfFullTextFiles){
-            if (fullTextFile.isFile() && fullTextFile.getName().endsWith(".xml")){
-                org.w3c.dom.Document fullTextDocFile = dBuilder.parse(fullTextFile);
-                Document fullTextDoc = new Document();
-
-                if (fullTextDocFile.getElementsByTagName("text").getLength() > 0) {
-                    String text = fullTextDocFile.getElementsByTagName("text").item(0).getTextContent();
-                    fullTextDoc.add(new TextField("text", text, Field.Store.YES));
-                }
-                if (fullTextDocFile.getElementsByTagName("title").getLength() > 0) {
-                    String title = fullTextDocFile.getElementsByTagName("title").item(0).getTextContent();
-                    fullTextDoc.add(new TextField("title", title, Field.Store.YES));
-                }
-
-                writer.addDocument(fullTextDoc);
-            }
-
-        }
+        Map<String, Document> metadataMap = new HashMap<>();
 
         for (File file : listOfFiles) {
             if (file.isFile() && file.getName().endsWith(".xml")) {
                 org.w3c.dom.Document xmlDoc = dBuilder.parse(file);
                 Document metadataDoc = new Document();
 
+                String title = null;
                 if (xmlDoc.getElementsByTagName("title").getLength() > 0) {
-                    String title = xmlDoc.getElementsByTagName("title").item(0).getTextContent();
+                    title = xmlDoc.getElementsByTagName("title").item(0).getTextContent();
                     metadataDoc.add(new TextField("title", title, Field.Store.YES));
                 }
 
@@ -92,10 +77,44 @@ public class LuceneEngine {
                     String keywords = xmlDoc.getElementsByTagName("keywords").item(0).getTextContent();
                     metadataDoc.add(new TextField("keywords", keywords, Field.Store.YES));
                 }
-                writer.addDocument(metadataDoc);
+
+                if (xmlDoc.getElementsByTagName("abstract").getLength() > 0) {
+                    String textAbstract = xmlDoc.getElementsByTagName("abstract").item(0).getTextContent();
+                    metadataDoc.add(new TextField("abstract", textAbstract, Field.Store.YES));
+                }
+
+                if (title != null) {
+                    metadataMap.put(title, metadataDoc);
+                }
             }
         }
 
+        for (File fullTextFile: listOfFullTextFiles){
+            if (fullTextFile.isFile() && fullTextFile.getName().endsWith(".xml")){
+                org.w3c.dom.Document fullTextDocFile = dBuilder.parse(fullTextFile);
+                Document fullTextDoc = new Document();
+                String title = null;
+
+                if (fullTextDocFile.getElementsByTagName("text").getLength() > 0) {
+                    String text = fullTextDocFile.getElementsByTagName("text").item(0).getTextContent();
+                    fullTextDoc.add(new TextField("text", text, Field.Store.YES));
+                }
+                if (fullTextDocFile.getElementsByTagName("title").getLength() > 0) {
+                    title = fullTextDocFile.getElementsByTagName("title").item(0).getTextContent();
+                    fullTextDoc.add(new TextField("title", title, Field.Store.YES));
+                }
+
+                // 合并元数据文档
+                if (title != null && metadataMap.containsKey(title)) {
+                    Document metadataDoc = metadataMap.get(title);
+                    for (IndexableField field : metadataDoc.getFields()) {
+                        fullTextDoc.add(field);
+                    }
+                }
+
+                writer.addDocument(fullTextDoc);
+            }
+        }
         writer.close();
     }
 }

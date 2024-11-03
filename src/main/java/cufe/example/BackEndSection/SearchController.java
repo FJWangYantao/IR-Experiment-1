@@ -28,11 +28,20 @@ public class SearchController {
     }
 
     @GetMapping("/search")
-    public List<String> search(@RequestParam String field, @RequestParam String query) throws Exception {
+    public List<SearchResult> search(@RequestParam String field, @RequestParam String query) throws Exception {
         List<org.apache.lucene.document.Document> results = searchService.search(field, query, 10);
         return results.stream()
-                .map(doc -> doc.get("title"))
+                .map(doc -> new SearchResult(doc.get("title"), doc.get("abstract")))
                 .distinct()
+                .collect(Collectors.toList());
+    }
+
+    @GetMapping("test")
+    public List<String> test(@RequestParam String field, @RequestParam String query) throws Exception {
+        List<org.apache.lucene.document.Document> results = searchService.search(field, query, 10);
+
+        return results.stream()
+                .map(doc -> doc.get("abstract"))
                 .collect(Collectors.toList());
     }
 

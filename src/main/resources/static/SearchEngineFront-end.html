@@ -41,11 +41,14 @@
                 data.forEach(item => {
                     if(item !== null){
                     resultsDiv.innerHTML += `<div class="card mb-2"><div class="card-body">
-                    <h5 class="card-title">${item}</h5>
+                    <h5 class="card-title">${item.title}</h5>
+                    <p class="card-text">${item.textAbstract ? item.textAbstract : '无简介'}</p>
                 </div></div>`;
-                }
+            }
                 });
             });
+            document.getElementById("searchQuery").value = '';
+
     }
 </script>
 </body>
