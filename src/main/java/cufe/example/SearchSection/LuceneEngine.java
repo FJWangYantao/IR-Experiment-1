@@ -1,12 +1,12 @@
 package cufe.example.SearchSection;
 
+
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.*;
-import org.apache.lucene.queryparser.classic.QueryParser;
-import org.apache.lucene.search.*;
+
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 
@@ -14,15 +14,22 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 
-public class LuceneEngine {
-    public static void main(String[] args) throws Exception {
 
-        StandardAnalyzer analyzer = new StandardAnalyzer();
-        Directory index = new RAMDirectory();
+public class LuceneEngine {
+    private final StandardAnalyzer analyzer;
+    private final Directory index;
+
+    public LuceneEngine(StandardAnalyzer analyzer, Directory index) {
+        this.analyzer = analyzer;
+        this.index = index;
+    }
+
+    public void indexDocuments() throws Exception {
 
         IndexWriterConfig config = new IndexWriterConfig(analyzer);
         IndexWriter writer = new IndexWriter(index, config);
 
+        //文件数据库路径
         File folder = new File("D:/360MoveData/Users/asus/Desktop/XML/ConvertedData/");
         File fullTextFolder = new File("D:/360MoveData/Users/asus/Desktop/XML/FullTexts/");
         File[] listOfFiles = folder.listFiles();
@@ -90,30 +97,5 @@ public class LuceneEngine {
         }
 
         writer.close();
-
-        // Example of querying the index
-        String querystr = "model";
-        String queryTerm = "model";
-        Query q = new QueryParser("text", analyzer).parse(querystr);
-        FuzzyQuery fuzzyQuery = new FuzzyQuery(new Term("text", queryTerm));
-
-
-        // Search
-        int hitsPerPage = 10;
-        IndexReader reader = DirectoryReader.open(index);
-        IndexSearcher searcher = new IndexSearcher(reader);
-        TopDocs docs = searcher.search(fuzzyQuery, hitsPerPage);
-        ScoreDoc[] hits = docs.scoreDocs;
-
-        // Display results
-        System.out.println("Found " + hits.length + " hits.");
-        for (int i = 0; i < hits.length; ++i) {
-            int docId = hits[i].doc;
-            Document d = searcher.doc(docId);
-            System.out.println((i + 1) + ". " + d.get("title"));
-        }
-
-        // Close the reader
-        reader.close();
     }
 }

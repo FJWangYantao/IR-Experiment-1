@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>学术论文搜索</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+<div class="container">
+    <h1 class="mt-5">学术论文搜索</h1>
+    <div class="input-group mb-3 mt-4">
+        <input type="text" class="form-control" placeholder="输入关键词" id="searchQuery">
+        <button class="btn btn-primary ml-3 px-5" type="button" onclick="performSearch()">搜索</button>
+    </div>
+    <div class="btn-group mb-3" role="group">
+        <button type="button" class="btn btn-secondary mr-2" onclick="setSearchField('title')">按标题</button>
+        <button type="button" class="btn btn-secondary mr-2" onclick="setSearchField('author')">按作者</button>
+        <button type="button" class="btn btn-secondary mr-2" onclick="setSearchField('date')">按日期</button>
+        <button type="button" class="btn btn-secondary mr-2" onclick="setSearchField('institution')">按机构</button>
+        <button type="button" class="btn btn-secondary mr-2" onclick="setSearchField('address')">按地址</button>
+        <button type="button" class="btn btn-secondary" onclick="setSearchField('keywords')">按关键词</button>
+    </div>
+    <div id="results"></div>
+</div>
+<script>
+    let selectedField = 'title'; // 默认搜索字段
+
+    function setSearchField(field) {
+        selectedField = field;
+    }
+
+    function performSearch() {
+        const query = document.getElementById('searchQuery').value;
+        fetch(`http://localhost:8080/search?query=${query}&field=${selectedField}`)
+            .then(response => response.json())
+            .then(data => {
+                const resultsDiv = document.getElementById('results');
+                resultsDiv.innerHTML = '';
+                data.forEach(item => {
+                    if(item !== null){
+                    resultsDiv.innerHTML += `<div class="card mb-2"><div class="card-body">
+                    <h5 class="card-title">${item}</h5>
+                </div></div>`;
+                }
+                });
+            });
+    }
+</script>
+</body>
+
+</html>

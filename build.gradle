@@ -1,6 +1,9 @@
 plugins {
     id 'java'
+    id 'org.springframework.boot' version '3.3.4'
 }
+
+apply plugin: 'io.spring.dependency-management'
 
 group = 'cufe.example'
 version = '1.0-SNAPSHOT'
@@ -8,6 +11,7 @@ version = '1.0-SNAPSHOT'
 repositories {
     mavenCentral()
     maven { url "https://grobid.s3.eu-west-1.amazonaws.com/repo/" }
+
 }
 
 dependencies {
@@ -19,6 +23,7 @@ dependencies {
     implementation 'org.apache.lucene:lucene-analyzers-common:8.11.1'
     implementation 'org.apache.lucene:lucene-queryparser:8.11.1'
     implementation 'org.jbibtex:jbibtex:1.0.19'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
 }
 
 test {
