@@ -4,8 +4,6 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import static cufe.example.ProcessDataSection.BibTeXToXMLConverter.escapeXml;
-
 public class FullTextExtractor {
 
     private final String grobidUrl;

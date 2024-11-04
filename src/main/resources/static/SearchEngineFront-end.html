@@ -15,17 +15,30 @@
         <button class="btn btn-primary ml-3 px-5" type="button" onclick="performSearch()">搜索</button>
     </div>
     <div class="btn-group mb-3" role="group">
-        <button type="button" class="btn btn-secondary mr-2" onclick="setSearchField('title')">按标题</button>
-        <button type="button" class="btn btn-secondary mr-2" onclick="setSearchField('author')">按作者</button>
-        <button type="button" class="btn btn-secondary mr-2" onclick="setSearchField('date')">按日期</button>
-        <button type="button" class="btn btn-secondary mr-2" onclick="setSearchField('institution')">按机构</button>
-        <button type="button" class="btn btn-secondary mr-2" onclick="setSearchField('address')">按地址</button>
-        <button type="button" class="btn btn-secondary" onclick="setSearchField('keywords')">按关键词</button>
+        <button type="button" class="btn btn-secondary mr-2" onclick="setSearchField('title'), changeMode(this)">按标题</button>
+        <button type="button" class="btn btn-secondary mr-2" onclick="setSearchField('author'), changeMode(this)">按作者</button>
+        <button type="button" class="btn btn-secondary mr-2" onclick="setSearchField('date'), changeMode(this)">按日期</button>
+        <button type="button" class="btn btn-secondary mr-2" onclick="setSearchField('institution'), changeMode(this)">按机构</button>
+        <button type="button" class="btn btn-secondary mr-2" onclick="setSearchField('address'), changeMode(this)">按地址</button>
+        <button type="button" class="btn btn-secondary" onclick="setSearchField('keywords'), changeMode(this)">按关键词</button>
+    </div>
     </div>
     <div id="results"></div>
 </div>
 <script>
     let selectedField = 'title'; // 默认搜索字段
+
+    function changeMode(button) {
+            document.querySelectorAll('.btn-group .btn').forEach(btn => {
+            btn.classList.remove('active', 'btn-primary');
+            btn.classList.add('btn-secondary');
+    });
+
+
+    button.classList.remove('btn-secondary');
+    button.classList.add('active', 'btn-primary');
+}
+
 
     function setSearchField(field) {
         selectedField = field;
