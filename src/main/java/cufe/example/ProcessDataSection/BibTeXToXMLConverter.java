@@ -56,7 +56,6 @@ public class BibTeXToXMLConverter {
                         });
                     }
                     convertedContent.append("</entry>\n");
-//                    String xmlFormatFile = escapeXml(convertedContent.toString());
 
                     saveToXmlFile(convertedContent.toString(),"D:/360MoveData/Users/asus/Desktop/XML/ConvertedData/" + "convertedData_" + count + ".xml");
                     System.out.println(bibTexFile.getName() + "converted!");

@@ -2,6 +2,7 @@ package cufe.example.BackEndSection;
 
 import cufe.example.SearchSection.LuceneEngine;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.document.Document;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,20 +30,12 @@ public class SearchController {
 
     @GetMapping("/search")
     public List<SearchResult> search(@RequestParam String field, @RequestParam String query) throws Exception {
-        List<org.apache.lucene.document.Document> results = searchService.search(field, query, 10);
+        List<Document> results = searchService.search(field, query, 10);
         return results.stream()
                 .map(doc -> new SearchResult(doc.get("title"), doc.get("abstract")))
                 .distinct()
                 .collect(Collectors.toList());
     }
 
-    @GetMapping("test")
-    public List<String> test(@RequestParam String field, @RequestParam String query) throws Exception {
-        List<org.apache.lucene.document.Document> results = searchService.search(field, query, 10);
-
-        return results.stream()
-                .map(doc -> doc.get("abstract"))
-                .collect(Collectors.toList());
-    }
 
 }

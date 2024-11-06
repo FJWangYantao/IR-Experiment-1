@@ -15,29 +15,37 @@
         <button class="btn btn-primary ml-3 px-5" type="button" onclick="performSearch()">搜索</button>
     </div>
     <div class="btn-group mb-3" role="group">
-        <button type="button" class="btn btn-secondary mr-2" onclick="setSearchField('title'), changeMode(this)">按标题</button>
-        <button type="button" class="btn btn-secondary mr-2" onclick="setSearchField('author'), changeMode(this)">按作者</button>
-        <button type="button" class="btn btn-secondary mr-2" onclick="setSearchField('date'), changeMode(this)">按日期</button>
-        <button type="button" class="btn btn-secondary mr-2" onclick="setSearchField('institution'), changeMode(this)">按机构</button>
-        <button type="button" class="btn btn-secondary mr-2" onclick="setSearchField('address'), changeMode(this)">按地址</button>
-        <button type="button" class="btn btn-secondary" onclick="setSearchField('keywords'), changeMode(this)">按关键词</button>
+        <button type="button" class="btn btn-secondary mr-2"
+                onclick="setSearchField('title'), changeMode(this)">按标题</button>
+        <button type="button" class="btn btn-secondary mr-2"
+                onclick="setSearchField('author'), changeMode(this)">按作者</button>
+        <button type="button" class="btn btn-secondary mr-2"
+                onclick="setSearchField('date'), changeMode(this)">按日期</button>
+        <button type="button" class="btn btn-secondary mr-2"
+                onclick="setSearchField('institution'), changeMode(this)">按机构</button>
+        <button type="button" class="btn btn-secondary mr-2"
+                onclick="setSearchField('address'), changeMode(this)">按地址</button>
+        <button type="button" class="btn btn-secondary mr-2"
+                onclick="setSearchField('text'), changeMode(this)">按全文</button>
+        <button type="button" class="btn btn-secondary"
+                onclick="setSearchField('keywords'), changeMode(this)">按关键词</button>
     </div>
-    </div>
-    <div id="results"></div>
+</div>
+<div id="results"></div>
 </div>
 <script>
     let selectedField = 'title'; // 默认搜索字段
 
     function changeMode(button) {
-            document.querySelectorAll('.btn-group .btn').forEach(btn => {
+        document.querySelectorAll('.btn-group .btn').forEach(btn => {
             btn.classList.remove('active', 'btn-primary');
             btn.classList.add('btn-secondary');
-    });
+        });
 
 
-    button.classList.remove('btn-secondary');
-    button.classList.add('active', 'btn-primary');
-}
+        button.classList.remove('btn-secondary');
+        button.classList.add('active', 'btn-primary');
+    }
 
 
     function setSearchField(field) {
@@ -51,17 +59,71 @@
             .then(data => {
                 const resultsDiv = document.getElementById('results');
                 resultsDiv.innerHTML = '';
-                data.forEach(item => {
-                    if(item !== null){
-                    resultsDiv.innerHTML += `<div class="card mb-2"><div class="card-body">
-                    <h5 class="card-title">${item.title}</h5>
-                    <p class="card-text">${item.textAbstract ? item.textAbstract : '无简介'}</p>
-                </div></div>`;
-            }
+                data.forEach((item, index) => {
+                    if (item !== null) {
+                        resultsDiv.innerHTML += `
+    <div class="card mb-2">
+        <div class="card-body">
+            <a href="#" onClick= getFulltextByTitle(${index}) id="fulltext-${index}">${item.title}</a>
+            <div class="text-container" id="text-container-${index}">
+                <p class="card-text abstract" id="abstract-${index}" style="max-height: 4.5em; overflow: hidden;">
+                    ${item.textAbstract ? item.textAbstract : '无简介'}
+                </p>
+                <p class="full-text" id="full-text-${index}" style="display: none;">
+
+                </p>
+                <a href="#" id="toggle-button-${index}" onclick="toggleText(event, ${index})">
+                    ${item.textAbstract ? "展开" : ''}
+                </a>
+            </div>
+        </div>
+    </div>`;
+                    }
                 });
             });
-            document.getElementById("searchQuery").value = '';
+        document.getElementById("searchQuery").value = '';
+    }
 
+    function toggleText(event, index) {
+        event.preventDefault(); // 阻止链接的默认行为
+        const fullText = document.getElementById(`full-text-${index}`);
+        const toggleButton = document.getElementById(`toggle-button-${index}`);
+        const abstractText = document.getElementById(`abstract-${index}`);
+
+        if (fullText.style.display === 'none') {
+            fullText.style.display = 'block'; // 显示完整文本
+            toggleButton.textContent = '收起'; // 更改按钮文本
+            abstractText.style.maxHeight = 'none'; // 取消最大高度限制
+        } else {
+            fullText.style.display = 'none'; // 隐藏完整文本
+            toggleButton.textContent = '展开'; // 更改按钮文本
+            abstractText.style.maxHeight = '4.5em'; // 恢复最大高度限制
+        }
+    }
+
+    function getFulltextByTitle(index) {
+        const title = document.getElementById(`fulltext-${index}`).innerText;
+        fetch(`http://localhost:8080/fulltext?title=${encodeURIComponent(title)}`)
+            .then(response => response.json())
+            .then(data => {
+                    const newTab = window.open();
+                    newTab.document.write(`
+            <html>
+                <head>
+                    <title>${data.title}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; }
+                        .content { padding: 20px; }
+                        .h1 { width: 80%; /* 或者其他合适的宽度 */
+                                margin: 0 auto; /* 左右自动居中 */ }
+                    </style>
+                </head>
+                <body>
+                    <h1>${data.title}</h1>
+                    <div class="content" id="content">${data.text}</div>
+                </body>
+            </html>`);
+                });
     }
 </script>
 </body>
