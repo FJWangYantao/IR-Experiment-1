@@ -114,8 +114,8 @@
                     <style>
                         body { font-family: Arial, sans-serif; }
                         .content { padding: 20px; }
-                        .h1 { width: 80%; /* 或者其他合适的宽度 */
-                                margin: 0 auto; /* 左右自动居中 */ }
+                        .h1 { width: 80%;
+                                margin: 0 auto;  }
                     </style>
                 </head>
                 <body>
@@ -125,6 +125,16 @@
             </html>`);
                 });
     }
+
+    document.addEventListener('DOMContentLoaded',() => {
+        const searchQuery = document.getElementById('searchQuery');
+
+        searchQuery.addEventListener('keypress', (event) => {
+        if (event.key === 'Enter') {
+            performSearch();
+        }
+    });
+    })
 </script>
 </body>
 
