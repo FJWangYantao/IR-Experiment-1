@@ -3,8 +3,6 @@ package cufe.example.BackEndSection.ExternalFunction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static org.grobid.core.utilities.crossref.CrossrefClient.logger;
-
 @Service
 public class FullTextService {
 

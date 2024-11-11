@@ -1,5 +1,6 @@
 package cufe.example.ProcessDataSection;
 
+
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -14,10 +15,11 @@ public class FullTextExtractor {
 
     public String processFulltextDocument(String filePath) throws IOException {
         File file = new File(filePath);
-        HttpURLConnection connection = (HttpURLConnection) new URL(grobidUrl + "/api/processFulltextDocument?output=xml&include=fulltext").openConnection();
+        HttpURLConnection connection = (HttpURLConnection) new URL(grobidUrl + "/api/processFulltextDocument").openConnection();
         connection.setDoOutput(true);
         connection.setRequestMethod("POST");
         connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=*****");
+        connection.setRequestProperty("Accept", "application/xml");
 
         try (DataOutputStream request = new DataOutputStream(connection.getOutputStream())) {
             request.writeBytes("--*****\r\n");
@@ -43,7 +45,7 @@ public class FullTextExtractor {
                 StringBuilder response = new StringBuilder();
 
                 while ((inputLine = in.readLine()) != null) {
-                    response.append(inputLine);
+                    response.append(inputLine + "\n");
                 }
 
                 return response.toString();
@@ -68,7 +70,7 @@ public class FullTextExtractor {
             for(File pdfFile : filePath.listFiles()){
                 if (pdfFile.isFile() && pdfFile.getName().endsWith(".pdf")){
                     pdfFullTextXml = escapeXml(client.processFulltextDocument(pdfFile.getPath()));
-                    client.saveToXmlFile(pdfFullTextXml,"D:/360MoveData/Users/asus/Desktop/XML/FullTexts/" + "fullTexts" + count + ".xml");
+                    client.saveToXmlFile(pdfFullTextXml,"D:/360MoveData/Users/asus/Desktop/XML/FixedData/FullTexts/" + "fullTexts" + count + ".xml");
                     System.out.println("Full Text " + count + " was extracted successfully.");
                     count++;
                 }
@@ -86,4 +88,6 @@ public class FullTextExtractor {
         input = input.replaceAll("[^\\p{Print}]", "");
         return input;
     }
+
+
 }

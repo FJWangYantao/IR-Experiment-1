@@ -22,10 +22,6 @@
         <button type="button" class="btn btn-secondary mr-2"
                 onclick="setSearchField('date'), changeMode(this)">按日期</button>
         <button type="button" class="btn btn-secondary mr-2"
-                onclick="setSearchField('institution'), changeMode(this)">按机构</button>
-        <button type="button" class="btn btn-secondary mr-2"
-                onclick="setSearchField('address'), changeMode(this)">按地址</button>
-        <button type="button" class="btn btn-secondary mr-2"
                 onclick="setSearchField('text'), changeMode(this)">按全文</button>
         <button type="button" class="btn btn-secondary"
                 onclick="setSearchField('keywords'), changeMode(this)">按关键词</button>
@@ -60,21 +56,17 @@
                 const resultsDiv = document.getElementById('results');
                 resultsDiv.innerHTML = '';
                 data.forEach((item, index) => {
+                    const uuid = item.uuid;
                     if (item !== null) {
                         resultsDiv.innerHTML += `
     <div class="card mb-2">
         <div class="card-body">
-            <a href="#" onClick= getFulltextByTitle(${index}) id="fulltext-${index}">${item.title}</a>
+            <a href="#" onClick= "getPDFByUUID('${uuid}')" id="fulltext-${index}">${item.title}</a>
             <div class="text-container" id="text-container-${index}">
                 <p class="card-text abstract" id="abstract-${index}" style="max-height: 4.5em; overflow: hidden;">
-                    ${item.textAbstract ? item.textAbstract : '无简介'}
+                    ${item.highlightText ? item.highlightText : '未检索到关键词'}
                 </p>
-                <p class="full-text" id="full-text-${index}" style="display: none;">
-
                 </p>
-                <a href="#" id="toggle-button-${index}" onclick="toggleText(event, ${index})">
-                    ${item.textAbstract ? "展开" : ''}
-                </a>
             </div>
         </div>
     </div>`;
@@ -83,48 +75,28 @@
             });
         document.getElementById("searchQuery").value = '';
     }
+    
 
-    function toggleText(event, index) {
-        event.preventDefault(); // 阻止链接的默认行为
-        const fullText = document.getElementById(`full-text-${index}`);
-        const toggleButton = document.getElementById(`toggle-button-${index}`);
-        const abstractText = document.getElementById(`abstract-${index}`);
 
-        if (fullText.style.display === 'none') {
-            fullText.style.display = 'block'; // 显示完整文本
-            toggleButton.textContent = '收起'; // 更改按钮文本
-            abstractText.style.maxHeight = 'none'; // 取消最大高度限制
-        } else {
-            fullText.style.display = 'none'; // 隐藏完整文本
-            toggleButton.textContent = '展开'; // 更改按钮文本
-            abstractText.style.maxHeight = '4.5em'; // 恢复最大高度限制
-        }
-    }
+    function getPDFByUUID(uuid) {
+        event.preventDefault();
+        fetch(`http://localhost:8080/pdf/${uuid}`)
+            .then(response => {
+                if(!response.ok){
+                    throw new Error('文件未找到');
+                }
+                    return response.blob();
+    })
+    .then(blob => {
+        const url = window.URL.createObjectURL(blob);
+        window.open(url, '_blank')
+    })
+    .catch(error => {
+        console.error('错误:',error);
+        alert(error.message);
+    })
+}
 
-    function getFulltextByTitle(index) {
-        const title = document.getElementById(`fulltext-${index}`).innerText;
-        fetch(`http://localhost:8080/fulltext?title=${encodeURIComponent(title)}`)
-            .then(response => response.json())
-            .then(data => {
-                    const newTab = window.open();
-                    newTab.document.write(`
-            <html>
-                <head>
-                    <title>${data.title}</title>
-                    <style>
-                        body { font-family: Arial, sans-serif; }
-                        .content { padding: 20px; }
-                        .h1 { width: 80%;
-                                margin: 0 auto;  }
-                    </style>
-                </head>
-                <body>
-                    <h1>${data.title}</h1>
-                    <div class="content" id="content">${data.text}</div>
-                </body>
-            </html>`);
-                });
-    }
 
     document.addEventListener('DOMContentLoaded',() => {
         const searchQuery = document.getElementById('searchQuery');
@@ -135,6 +107,8 @@
         }
     });
     })
+
+    
 </script>
 </body>
 

@@ -42,7 +42,7 @@ public class MetaDataExtractor {
                 StringBuilder response = new StringBuilder();
 
                 while ((inputLine = in.readLine()) != null) {
-                    response.append(inputLine);
+                    response.append(inputLine + "\n");
                 }
 
                 return response.toString();
@@ -70,7 +70,7 @@ public class MetaDataExtractor {
             for (File pdfFile : filePath.listFiles()){
                 if (pdfFile.isFile() && pdfFile.getName().endsWith(".pdf")){
                     pdfMetadataXml = client.ExtractDocumentsMetadata(pdfFile.getPath());
-                    client.saveToXmlFile(pdfMetadataXml,"D:/360MoveData/Users/asus/Desktop/XML/Metadata/" + "ExtractedData_" + count + ".bib");
+                    client.saveToXmlFile(pdfMetadataXml,"D:/360MoveData/Users/asus/Desktop/XML/TestData/Metadata/" + "ExtractedData_" + count + ".bib");
                     System.out.println("Metadata " + count + " was extracted successfully.");
                     count++;
                 }

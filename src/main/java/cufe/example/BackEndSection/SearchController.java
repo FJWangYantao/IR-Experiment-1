@@ -30,12 +30,10 @@ public class SearchController {
 
     @GetMapping("/search")
     public List<SearchResult> search(@RequestParam String field, @RequestParam String query) throws Exception {
-        List<Document> results = searchService.search(field, query, 10);
-        return results.stream()
-                .map(doc -> new SearchResult(doc.get("title"), doc.get("abstract")))
-                .distinct()
-                .collect(Collectors.toList());
+        List<SearchResult> results = searchService.search(field, query, 20);
+        return results;
     }
+
 
 
 }
