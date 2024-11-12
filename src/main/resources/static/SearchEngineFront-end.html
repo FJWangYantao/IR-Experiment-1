@@ -7,114 +7,183 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <link href="style.css" rel="stylesheet">
 </head>
 
 <body>
-<div class="bg-image">
-<div class="container">
-    <h1>LOGO的位置</h1>
-    <div class="input-group mb-3" style="width: 1000px; height: 75px; margin-top: 175px; margin-left: 163px;">
-        <button class="btn btn-outline-secondary dropdown-toggle bg-warning-subtle" style="width: 150px;" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="dropdown-button">按标题</button>
-        <ul class="dropdown-menu bg-warning-subtle">
-            <li><a class="dropdown-item" href="#" onclick="changeButtonText(this.innerText), setSearchField('author')">按作者</a></li>
-            <li><a class="dropdown-item" href="#" onclick="changeButtonText(this.innerText), setSearchField('date')">按日期</a></li>
-            <li><a class="dropdown-item" href="#" onclick="changeButtonText(this.innerText), setSearchField('text')">按全文</a></li>
-            <li><a class="dropdown-item" href="#" onclick="changeButtonText(this.innerText), setSearchField('keywords')">按关键词</a></li>
-        </ul>
-        <input type="text" class="form-control" placeholder="输入关键词" id="searchQuery">
-        <button class="btn btn-primary ml-3 px-5" type="button" onclick="performSearch()">搜索</button>
+    <div class="bg-image" id="backgrounds">
+        <div id="icon">
+            <button type="button" onclick="changeBackground()" class="btn btn-outline-secondary">
+                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+                    class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2z"></path>
+                    <path
+                        d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466">
+                    </path>
+                </svg>
+                <span class="visually-hidden">Button</span>
+            </button>
+        </div>
+        <div class="container">
+            <div>
+                <h1
+                    style="font-family: fantasy;font-size: 5em;margin-left: 415px;margin-top: 50px;color: #A3C1DA;">
+                    THSIS REVERIES</h1>
+            </div>
+            <div class="input-group mb-3" style="width: 1000px; height: 65px;  margin-left: 150px;margin-top: 20px;">
+                <button class="btn btn-outline-secondary dropdown-toggle bg-warning-subtle" style="width: 150px;background-color: #A8E6CE;border-color: #D3D3D3;"
+                    type="button" data-bs-toggle="dropdown" aria-expanded="false"
+                    id="dropdown-button"><b>按标题</b></button>
+                <ul class="dropdown-menu bg-warning-subtle">
+                    <li><a class="dropdown-item" href="#"
+                            onclick="changeButtonText(this.innerText), setSearchField('author')"><b>按作者</b></a></li>
+                    <li><a class="dropdown-item" href="#"
+                            onclick="changeButtonText(this.innerText), setSearchField('date')"><b>按日期</b></a></li>
+                    <li><a class="dropdown-item" href="#"
+                            onclick="changeButtonText(this.innerText), setSearchField('text')"><b>按全文</b></a></li>
+                    <li><a class="dropdown-item" href="#"
+                            onclick="changeButtonText(this.innerText), setSearchField('keywords')"><b>按关键词</b></a></li>
+                    <li><a class="dropdown-item" href="#"
+                            onclick="changeButtonText(this.innerText), setSearchField('title')"><b>按标题</b></a></li>
+                </ul>
+                <input type="text" class="form-control" placeholder="输入关键词" id="searchQuery">
+                <button class="btn btn-primary ml-3 px-5 el-icon-circle-cross" type="button" style="background-color: #A8E6CE;border-color: #D3D3D3;"
+                    onclick="performSearch()">搜索</button>
+                <div id="results" style="margin-top: 20px; margin-left: 55px;"></div>
+                <div id="pagination" style="text-align: center;margin-left: 425px;"></div>
+            </div>
+        </div>
     </div>
-</div>
-<div id="results"></div>
-</div>
-</div>
-<script>
-    let selectedField = 'title'; // 默认搜索字段
+    </div>
+    <script>
+        let selectedField = 'title'; // 默认搜索字段
+        let isDefaultBackground = true;
+        let results = [];
+        let currentPage = 1;
+        const hitsPerPage = 2;
 
-    function changeMode(button) {
-        document.querySelectorAll('.btn-group .btn').forEach(btn => {
-            btn.classList.remove('active', 'btn-primary');
-            btn.classList.add('btn-secondary');
-        });
+        const backgrounds = [
+            'background1.jpg',
+            'background2.jpg',
+            'background3.jpg',
+            'background4.jpg',
+            'background5.jpg',
+            'background6.jpg',
+            'background7.jpg'
+        ];
 
+        function changeBackground() {
+            const randomIndex = Math.floor(Math.random() * backgrounds.length);
+            const selectedBackground = backgrounds[randomIndex];
 
-        button.classList.remove('btn-secondary');
-        button.classList.add('active', 'btn-primary');
-    }
+            document.getElementById('backgrounds').style.background = `url('${selectedBackground}') no-repeat center center fixed`;
+            document.getElementById('backgrounds').style.backgroundSize = 'cover';
+        }
 
-    function changeButtonText(text) {
+        function changeButtonText(text) {
             document.getElementById('dropdown-button').innerText = text;
         }
 
 
-    function setSearchField(field) {
-        selectedField = field;
-    }
-
-    function performSearch() {
-        const query = document.getElementById('searchQuery').value;
-        fetch(`http://localhost:8080/search?query=${query}&field=${selectedField}`)
-            .then(response => response.json())  
-            .then(data => {
-                const resultsDiv = document.getElementById('results');
-                resultsDiv.innerHTML = '';
-                data.forEach((item, index) => {
-                    const uuid = item.uuid;
-                    if (item !== null) {
-                        resultsDiv.innerHTML += `
-    <div class="card mb-2" style="width:900px; margin-left:410px; background-color:#EEE8AA">
-        <div class="card-body">
-                <p style="color:#87CEFA; font-size:25px;font-family: Sans-serif;"><b>${item.title}</b></p>
-                <p><b style="font-size 17px">Author: <div style="color: #F5FFFA">${item.author}</div></b></p>
-                <p class="card-text abstract" id="abstract-${index}" style="max-height: 4.5em; overflow: hidden;">
-                    ${item.highlightText ? item.highlightText : '未检索到关键词'}
-                </p>
-                <a href="#" onClick= "getPDFByUUID('${uuid}')">[View PDF]</a>                
-            </div>
-        </div>
-    </div>`;
-                    }
-                });
-            });
-        document.getElementById("searchQuery").value = '';
-    }
-    
-
-
-    function getPDFByUUID(uuid) {
-        event.preventDefault();
-        fetch(`http://localhost:8080/pdf/${uuid}`)
-            .then(response => {
-                if(!response.ok){
-                    throw new Error('文件未找到');
-                }
-                    return response.blob();
-    })
-    .then(blob => {
-        const url = window.URL.createObjectURL(blob);
-        window.open(url, '_blank')
-    })
-    .catch(error => {
-        console.error('错误:',error);
-        alert(error.message);
-    })
-}
-
-
-    document.addEventListener('DOMContentLoaded',() => {
-        const searchQuery = document.getElementById('searchQuery');
-
-        searchQuery.addEventListener('keypress', (event) => {
-        if (event.key === 'Enter') {
-            performSearch();
+        function setSearchField(field) {
+            selectedField = field;
         }
-    });
-    })
 
-    
-</script>
+        function performSearch() {
+            const query = document.getElementById('searchQuery').value;
+            fetch(`http://localhost:8080/search?query=${query}&field=${selectedField}`)
+                .then(response => response.json())
+                .then(data => {
+                    results = data;
+                    currentPage = 1;
+                    renderResults();
+                    renderPagination();
+                });
+            document.getElementById("searchQuery").value = '';
+        }
+
+        function renderResults() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '';
+            const start = (currentPage - 1) * hitsPerPage;
+            const end = start + hitsPerPage;
+            const currentResults = results.slice(start, end);
+
+            currentResults.forEach((item, index) => {
+                resultsDiv.innerHTML += `
+            <div class="card mb-2" style="width:900px; background-color:#FAF3E0;">
+                <div class="card-body">
+                    <p style="color:#333333; font-size:25px;font-family: Sans-serif;"><b>${item.title}</b></p>
+                    <p><b style="font-size 17px">Author: <div style="color: #555555">${item.author}</div></b></p>
+                    <p class="card-text abstract" id="abstract-${index}" style="max-height: 4.5em; overflow: hidden;">
+                        ${item.highlightText ? item.highlightText : '未检索到关键词'}
+                    </p>
+                    <a href="#" onClick= "getPDFByUUID('${item.uuid}')">[View PDF]</a>
+                </div>
+            </div>`;
+            });
+        }
+
+        function renderPagination() {
+            const paginationDiv = document.getElementById('pagination');
+            paginationDiv.innerHTML = '';
+
+            const totalPages = Math.ceil(results.length / hitsPerPage);
+
+            if (currentPage > 1) {
+                paginationDiv.innerHTML += `<button style="position:absolute;left:40px;z-index:50;" onclick="changePage(currentPage - 1)">上一页</button>`;
+            }
+
+            if (currentPage < totalPages) {
+                paginationDiv.innerHTML += `<button style="position:absolute;right:40px;z-index:50;" onclick="changePage(currentPage + 1)">下一页</button>`;
+            }
+
+            paginationDiv.innerHTML += `<span style="color:lightyellow;position:absolute;right:10px;left:10px;">第 ${currentPage} 页 / ${totalPages} 页</span>`;
+
+
+        }
+
+        function changePage(page) {
+            currentPage = page;
+            renderResults();
+            renderPagination();
+        }
+
+
+        function getPDFByUUID(uuid) {
+            event.preventDefault();
+            fetch(`http://localhost:8080/pdf/${uuid}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('文件未找到');
+                    }
+                    return response.blob();
+                })
+                .then(blob => {
+                    const url = window.URL.createObjectURL(blob);
+                    window.open(url, '_blank')
+                })
+                .catch(error => {
+                    console.error('错误:', error);
+                    alert(error.message);
+                })
+        }
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchQuery = document.getElementById('searchQuery');
+
+            searchQuery.addEventListener('keypress', (event) => {
+                if (event.key === 'Enter') {
+                    performSearch();
+                }
+            });
+        })
+
+
+    </script>
 </body>
 
 </html>
