@@ -30,7 +30,7 @@ public class SearchController {
 
     @GetMapping("/search")
     public List<SearchResult> search(@RequestParam String field, @RequestParam String query) throws Exception {
-        List<SearchResult> results = searchService.search(field, query, 20);
+        List<SearchResult> results = searchService.search(field, query, 10);
         return results;
     }
 

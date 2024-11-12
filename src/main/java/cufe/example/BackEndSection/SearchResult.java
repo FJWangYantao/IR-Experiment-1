@@ -2,14 +2,14 @@ package cufe.example.BackEndSection;
 
 public class SearchResult {
     private String title;
-    private String textAbstract;
+    private String author;
     private String highlightText;
     private String uuid;
 
 
-    public SearchResult(String title, String textAbstract, String highlightText, String uuid) {
+    public SearchResult(String title, String author, String highlightText, String uuid) {
         this.title = title;
-        this.textAbstract = textAbstract;
+        this.author = author;
         this.highlightText = highlightText;
         this.uuid = uuid;
     }
@@ -41,11 +41,11 @@ public class SearchResult {
         this.title = title;
     }
 
-    public String getTextAbstract() {
-        return textAbstract;
+    public String getAuthor() {
+        return author;
     }
 
-    public void setTextAbstract(String textAbstract) {
-        this.textAbstract = textAbstract;
+    public void setAuthor(String author) {
+        this.author = author;
     }
 }

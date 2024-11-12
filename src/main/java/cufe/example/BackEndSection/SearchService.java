@@ -40,7 +40,7 @@ public class SearchService {
                 String uuid = doc.get("uuid");
                 String text = doc.get(field);
                 String highlightedText = highlighter.getBestFragment(analyzer, field, text);
-                SearchResult searchResult = new SearchResult(doc.get("title"), doc.get("abstract"), highlightedText, uuid);
+                SearchResult searchResult = new SearchResult(doc.get("title"), doc.get("author"), highlightedText, uuid);
                 results.add(searchResult);
             }
             return results;
