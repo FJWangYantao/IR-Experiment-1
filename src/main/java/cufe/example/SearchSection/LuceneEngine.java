@@ -82,11 +82,6 @@ public class LuceneEngine {
                         metadataDoc.add(new TextField("date", date, Field.Store.YES));
                     }
 
-                    if (xmlDoc.getElementsByTagName("affiliation").getLength() > 0) {
-                        String affiliation = xmlDoc.getElementsByTagName("affiliation").item(0).getTextContent();
-                        metadataDoc.add(new TextField("affiliation", affiliation, Field.Store.YES));
-                    }
-
                     if (xmlDoc.getElementsByTagName("address").getLength() > 0) {
                         String address = xmlDoc.getElementsByTagName("address").item(0).getTextContent();
                         metadataDoc.add(new TextField("address", address, Field.Store.YES));

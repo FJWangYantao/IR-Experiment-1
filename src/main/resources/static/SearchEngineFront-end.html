@@ -14,8 +14,19 @@
 
 <body>
     <div class="bg-image" id="backgrounds">
+
+        <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title" id="offcanvasRightLabel">收藏夹</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body" id="collections">
+
+            </div>
+        </div>
+
         <div id="icon">
-            <button type="button" onclick="changeBackground()" class="btn btn-outline-secondary">
+            <button type="button" onclick="changeBackground()" class="btn">
                 <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
                     class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
                     <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2z"></path>
@@ -23,19 +34,27 @@
                         d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466">
                     </path>
                 </svg>
+            </button>
+            <button class="btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight"
+                aria-controls="offcanvasRight" onclick="getCollections()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-book"
+                    viewBox="0 0 16 16">
+                    <path
+                        d="M1 2.828c.885-.37 2.154-.769 3.388-.893 1.33-.134 2.458.063 3.112.752v9.746c-.935-.53-2.12-.603-3.213-.493-1.18.12-2.37.461-3.287.811zm7.5-.141c.654-.689 1.782-.886 3.112-.752 1.234.124 2.503.523 3.388.893v9.923c-.918-.35-2.107-.692-3.287-.81-1.094-.111-2.278-.039-3.213.492zM8 1.783C7.015.936 5.587.81 4.287.94c-1.514.153-3.042.672-3.994 1.105A.5.5 0 0 0 0 2.5v11a.5.5 0 0 0 .707.455c.882-.4 2.303-.881 3.68-1.02 1.409-.142 2.59.087 3.223.877a.5.5 0 0 0 .78 0c.633-.79 1.814-1.019 3.222-.877 1.378.139 2.8.62 3.681 1.02A.5.5 0 0 0 16 13.5v-11a.5.5 0 0 0-.293-.455c-.952-.433-2.48-.952-3.994-1.105C10.413.809 8.985.936 8 1.783">
+                    </path>
+                </svg>
                 <span class="visually-hidden">Button</span>
             </button>
         </div>
         <div class="container">
             <div>
-                <h1
-                    style="font-family: fantasy;font-size: 5em;margin-left: 415px;margin-top: 50px;color: #A3C1DA;">
+                <h1 style="font-family: fantasy;font-size: 5em;margin-left: 415px;margin-top: 50px;color: #A3C1DA;">
                     THSIS REVERIES</h1>
             </div>
             <div class="input-group mb-3" style="width: 1000px; height: 65px;  margin-left: 150px;margin-top: 20px;">
-                <button class="btn btn-outline-secondary dropdown-toggle bg-warning-subtle" style="width: 150px;background-color: #A8E6CE;border-color: #D3D3D3;"
-                    type="button" data-bs-toggle="dropdown" aria-expanded="false"
-                    id="dropdown-button"><b>按标题</b></button>
+                <button class="btn btn-outline-secondary dropdown-toggle bg-warning-subtle"
+                    style="width: 150px;background-color: #A8E6CE;border-color: #D3D3D3;" type="button"
+                    data-bs-toggle="dropdown" aria-expanded="false" id="dropdown-button"><b>按标题</b></button>
                 <ul class="dropdown-menu bg-warning-subtle">
                     <li><a class="dropdown-item" href="#"
                             onclick="changeButtonText(this.innerText), setSearchField('author')"><b>按作者</b></a></li>
@@ -49,8 +68,8 @@
                             onclick="changeButtonText(this.innerText), setSearchField('title')"><b>按标题</b></a></li>
                 </ul>
                 <input type="text" class="form-control" placeholder="输入关键词" id="searchQuery">
-                <button class="btn btn-primary ml-3 px-5 el-icon-circle-cross" type="button" style="background-color: #A8E6CE;border-color: #D3D3D3;"
-                    onclick="performSearch()">搜索</button>
+                <button class="btn btn-primary ml-3 px-5 el-icon-circle-cross" type="button"
+                    style="background-color: #A8E6CE;border-color: #D3D3D3;" onclick="performSearch()">搜索</button>
                 <div id="results" style="margin-top: 20px; margin-left: 55px;"></div>
                 <div id="pagination" style="text-align: center;margin-left: 425px;"></div>
             </div>
@@ -91,16 +110,20 @@
             selectedField = field;
         }
 
-        function performSearch() {
+        async function performSearch() {
             const query = document.getElementById('searchQuery').value;
-            fetch(`http://localhost:8080/search?query=${query}&field=${selectedField}`)
-                .then(response => response.json())
-                .then(data => {
-                    results = data;
-                    currentPage = 1;
-                    renderResults();
-                    renderPagination();
-                });
+            const searchResponse = await fetch(`http://localhost:8080/search?query=${query}&field=${selectedField}`);
+            const data = await searchResponse.json();
+
+            const collectStatusPromises = data.map(async (item) => {
+                item.isFavorited = await checkIfFavorited(item.uuid); // 将收藏状态加入结果数据
+                return item;
+            });
+
+            results = await Promise.all(collectStatusPromises);
+            currentPage = 1;
+            renderResults();
+            renderPagination();
             document.getElementById("searchQuery").value = '';
         }
 
@@ -112,18 +135,155 @@
             const currentResults = results.slice(start, end);
 
             currentResults.forEach((item, index) => {
+                const buttonHtml = `
+            <button onclick="toggleFavorite('${item.uuid}', '${item.title}', '${item.author}', this)"
+                style="background-color: ${item.isFavorited ? '#A8E6CE' : ''}">
+                ${item.isFavorited ? '已收藏' : '收藏'}
+            </button>
+        `;
+
                 resultsDiv.innerHTML += `
             <div class="card mb-2" style="width:900px; background-color:#FAF3E0;">
                 <div class="card-body">
                     <p style="color:#333333; font-size:25px;font-family: Sans-serif;"><b>${item.title}</b></p>
-                    <p><b style="font-size 17px">Author: <div style="color: #555555">${item.author}</div></b></p>
+                    <p><b style="font-size: 17px">Author: <div style="color: #555555">${item.author}</div></b></p>
                     <p class="card-text abstract" id="abstract-${index}" style="max-height: 4.5em; overflow: hidden;">
                         ${item.highlightText ? item.highlightText : '未检索到关键词'}
                     </p>
-                    <a href="#" onClick= "getPDFByUUID('${item.uuid}')">[View PDF]</a>
+                    <a href="#" onClick="getPDFByUUID('${item.uuid}')">[View PDF]</a>
+                    ${buttonHtml}
                 </div>
             </div>`;
             });
+        }
+
+
+        async function getCollections() {
+            const collections = document.getElementById('collections');
+            collections.innerHTML = ''; // 清空现有内容
+
+            try {
+                const response = await fetch(`http://localhost:8080/api/getArticles`);
+                if (!response.ok) {
+                    throw new Error('网络响应失败');
+                }
+                const data = await response.json();
+                data.forEach(article => {
+                    const listItem = document.createElement('div'); // 创建一个新的 div 元素
+                    listItem.className = 'collection-item'; // 添加类名以便于样式
+
+                    // 安全地添加标题和作者
+                    const title = document.createElement('strong');
+                    title.textContent = article.title;
+
+                    const author = document.createElement('span');
+                    author.textContent = ` by ${article.author}`;
+
+                    const pdfLink = document.createElement('a');
+                    pdfLink.href = '#';
+                    pdfLink.textContent = '[View PDF]';
+                    pdfLink.onclick = () => getPDFByUUID(article.uuid); // 使用事件处理程序
+
+                    const deleteButton = document.createElement('button');
+                    deleteButton.textContent = '取消收藏';
+                    deleteButton.onclick = () => deleteArticle(article.uuid);
+
+                    // 将元素添加到 listItem 中
+                    listItem.appendChild(title);
+                    listItem.appendChild(document.createElement('br'));
+                    listItem.appendChild(author);
+                    listItem.appendChild(document.createElement('br'));
+                    listItem.appendChild(pdfLink);
+                    listItem.appendChild(deleteButton);
+
+                    // 添加横线
+                    const hr = document.createElement('hr');
+                    hr.style.margin = '10px 0';
+                    hr.style.border = '1px solid #A3C1DA';
+                    listItem.appendChild(hr);
+
+                    collections.appendChild(listItem); // 将新元素添加到 collections 中
+                });
+            } catch (error) {
+                console.error('获取收藏夹失败:', error);
+                collections.innerHTML = '<p>加载收藏夹失败，请稍后再试。</p>';
+            }
+        }
+
+        async function checkIfFavorited(uuid) {
+            try {
+                const response = await fetch(`http://localhost:8080/api/checkFavorite/${uuid}`);
+                if (!response.ok) {
+                    throw new Error('检查收藏状态失败');
+                }
+                const result = await response.json();
+                return result; // 直接返回布尔值
+            } catch (error) {
+                console.error('查询收藏状态失败:', error);
+                return false; // 默认返回 false
+            }
+        }
+
+
+        async function changeCollectButton(button, uuid) {
+            const isFavorited = await checkIfFavorited(uuid);
+            if (isFavorited) {
+                button.innerText = '已收藏';
+                button.style.backgroundColor = '#A8E6CE'; // 可选：更改按钮颜色
+            } else {
+                button.innerText = '收藏';
+                button.style.backgroundColor = ''; // 可选：恢复按钮颜色
+            }
+        }
+
+
+
+        function toggleFavorite(uuid, title, author, button) {
+            if (button.innerText === '收藏') {
+                fetch(`http://localhost:8080/api/createArticle?title=${title}&uuid=${uuid}&author=${author}`, {
+                    method: 'POST'
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error("网络响应失败");
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        button.innerText = '已收藏';
+                        button.style.backgroundColor = '#A8E6CE'; // 可选：更改按钮颜色
+                    })
+
+            } else {
+                fetch(`http://localhost:8080/api/deleteArticle/${uuid}`, {
+                    method: 'DELETE'
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error("网络响应失败");
+                        }
+                    })
+                    .then(data => {
+                        button.innerText = '收藏';
+                        button.style.backgroundColor = ''; // 可选：恢复按钮颜色
+                    })
+
+
+            }
+        }
+
+        function deleteArticle(uuid) {
+            fetch(`http://localhost:8080/api/deleteArticle/${uuid}`, {
+                method: 'DELETE'
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("网络响应失败");
+                    }
+                })
+                .then(data => {
+                    getCollections();
+                })
         }
 
         function renderPagination() {
@@ -131,6 +291,10 @@
             paginationDiv.innerHTML = '';
 
             const totalPages = Math.ceil(results.length / hitsPerPage);
+            if (totalPages === 0) {
+                paginationDiv.innerHTML += `<span style="color:lightyellow;position:absolute;right:10px;left:10px;font-size: 6em;">未找到结果！！！</span>`;
+                return;
+            }
 
             if (currentPage > 1) {
                 paginationDiv.innerHTML += `<button style="position:absolute;left:40px;z-index:50;" onclick="changePage(currentPage - 1)">上一页</button>`;

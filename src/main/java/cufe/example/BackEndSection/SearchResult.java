@@ -5,6 +5,7 @@ public class SearchResult {
     private String author;
     private String highlightText;
     private String uuid;
+//    private int numberOfResult;
 
 
     public SearchResult(String title, String author, String highlightText, String uuid) {
